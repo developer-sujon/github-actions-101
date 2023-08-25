@@ -1,0 +1,11 @@
+{
+  "name": "github-actions",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/developer-sujon/github-actions",
+  "author": "developer-sujon <devoloper.sujon.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
