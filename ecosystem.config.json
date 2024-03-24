@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "Push to Production Single Github Server",
+      "name": "Push to Single Github Server",
       "script": "dist/main.js",
       "instances": 1,
       "autorestart": true,

@@ -1,13 +1,13 @@
-name: Push to Production Single Github Server
+name: Push to Single Github Server
 
 on:
   push:
     branches:
-      - production
+      - github-single-server
 
 jobs:
-  push-to-production-server:
-    name: Push to Production Single Github Server
+  push-to-single-github-server:
+    name: Push to Single Github Server
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
