@@ -22,11 +22,11 @@ jobs:
       - name: Config env
         run: |
           cat << EOF > .env
-          SERVER_PORT=3001
+          SERVER_PORT=${{ secrets.SERVER_PORT }}
           EOF
       - name: Build Application
         run: yarn build
       - name: Run Application
         run: yarn start:prod
-      - name: Run pm2 logs
+      - name: Run pm2 logs 0
         run: pm2 logs
