@@ -10,7 +10,7 @@
 .env.local
 .env.staging
 
-# Logs
+# Logs files
 logs
 *.log
 npm-debug.log*
