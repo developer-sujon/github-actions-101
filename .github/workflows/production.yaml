@@ -1,0 +1,28 @@
+name: Push to Production Single Github Server
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  push-to-production-server:
+    name: Push to Production Single Github Server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "v18.18.0"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Config env
+        run: |
+          cat << EOF > .env
+          SERVER_PORT=5600
+          EOF
+      - name: Build Application
+        run: yarn build
+      - name: Run Application
+        run: yarn start:prod
