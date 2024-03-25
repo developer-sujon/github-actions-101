@@ -22,7 +22,7 @@ jobs:
       - name: Config env
         run: |
           cat << EOF > .env
-          SERVER_PORT=${{secrets.SERVER_PORT}}
+          APP_NAME=${{secrets.APP_NAME}}
           EOF
       - name: Build Application
         run: yarn build
