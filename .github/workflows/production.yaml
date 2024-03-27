@@ -3,7 +3,7 @@ name: Push to Single Self Hosted
 on:
   push:
     branches:
-      - single-self-hosted
+      - main
 
 jobs:
   push-to-single-shunno-server:

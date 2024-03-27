@@ -1,73 +1,97 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+GitHub/EC2 Instance | Automatic Deployment using GitHub Action
+To automate the deployment of your Node.js Express server to a self-hosted Ubuntu Virtual Private Server (VPS) using GitHub Actions, follow these steps:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Prerequisites:
+Before you begin, make sure you have the following:
 
-## Description
+1. A GitHub account
+2. A Virtual Private Server (VPS) running Ubuntu
+2. Your Node.js Express server code ready
+3. Basic knowledge of using the command-line interface (CLI)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Step 1: Set Up Your Ubuntu VPS
+Ensure that you have a Virtual Private Server (VPS) running Ubuntu installed and configured. You can obtain a VPS from providers like AWS EC2, DigitalOcean, Linode, etc.
 
-## Installation
+### Step 2: Create a GitHub Repository
+Create a new repository on GitHub and push your Node.js Express server code to this repository.
 
-```bash
-$ yarn install
+### Step 3: Set Up Self-Hosted Runner on Your VPS
+Configure a self-hosted GitHub Actions runner on your Ubuntu VPS. Follow the instructions provided by GitHub to set up and configure a self-hosted runner.
+
+### Step 4: Create GitHub Workflow
+Inside your GitHub repository, create a new directory named .github/workflows.
+
+Within this directory, create a workflow file (e.g., deploy.yml) with the following content:
+
+```
+yaml
+Copy code
+name: Deploy to Self-Hosted VPS
+
+on:
+  push:
+    branches:
+      - self-hosted
+
+jobs:
+  deploy:
+    name: Deploy to Self-Hosted VPS
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: Install dependencies
+        run: |
+          npm install --frozen-lockfile
+          npm install -g pm2
+
+      - name: Configure environment
+        run: |
+          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
+
+      - name: Build Application
+        run: npm run build
+
+      - name: Run Application
+        run: pm2 start npm --name "my-app" -- start
 ```
 
-## Running the app
+Save to grepper
+Replace SERVER_PORT with the environment variable your application uses for the port.
 
-```bash
-# development
-$ yarn run start
+### Step 5: Create GitHub Secrets
+* Navigate to your repository on GitHub.
+* Go to the "Settings" tab.
+* In the left sidebar, click on "Secrets".
+* Click on the "New repository secret" button.
+* Enter the name and value of your secret, then click "Add secret".
+* Ensure that the secret name matches the one used in your workflow (SERVER_PORT in this example).
 
-# watch mode
-$ yarn run start:dev
+That's it! Your Node.js Express server will now be automatically deployed to your self-hosted Ubuntu VPS whenever you push changes to the self-hosted branch of your GitHub repository.
 
-# production mode
-$ yarn run start:prod
-```
 
-## Test
+### Step 6: Create GitHub Runner and Configure
 
-```bash
-# unit tests
-$ yarn run test
+Download and Configure the GitHub Runner:
 
-# e2e tests
-$ yarn run test:e2e
+On your Ubuntu VPS, download the GitHub Actions self-hosted runner package by following the instructions provided by GitHub. You can typically find these instructions in the "Set up and configure a self-hosted runner" section of your GitHub repository's Actions settings.
+Extract the downloaded package and run the configuration script. During the configuration process, you'll be prompted to enter your GitHub repository's URL, an access token, and other configuration details.
+Start the GitHub Runner:
 
-# test coverage
-$ yarn run test:cov
-```
+Once the configuration is complete, start the GitHub runner service on your VPS. This service will listen for jobs from your GitHub repository and execute them on your VPS.
+You can usually start the runner service using a command like ./svc.sh start.
+Verify Runner Connection:
 
-## Support
+Go to your GitHub repository's "Settings" > "Actions" > "Self-hosted runners" section.
+You should see your self-hosted runner listed as active. If it's active and idle, it means it's successfully connected to your GitHub repository and ready to execute workflows.
+Monitor Runner Status:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Keep an eye on the runner status to ensure it remains connected and operational. You can monitor this through the GitHub Actions settings or by checking the status of the runner service on your VPS.
+By completing these steps, you'll have successfully created and configured a GitHub Actions self-hosted runner on your Ubuntu VPS. This runner will be responsible for executing workflows triggered by events in your GitHub repository, such as pushes to the self-hosted branch, allowing for automated deployment of your Node.js Express server.
