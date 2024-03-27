@@ -28,5 +28,5 @@ jobs:
         run: yarn build
       - name: Run Application
         run: yarn start:prod
-      # - name: Run pm2 logs 0
-      #   run: pm2 logs
+      - name: Run pm2 logs 0
+        run: pm2 logs
