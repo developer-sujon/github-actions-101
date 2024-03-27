@@ -1,13 +1,13 @@
-name: Push to Single Shunno Server
+name: Push to Single Self Hosted
 
 on:
   push:
     branches:
-      - shunno-single-server
+      - single-self-hosted
 
 jobs:
   push-to-single-shunno-server:
-    name: Push to Single Shunno Server
+    name: Push to Single Self Hosted
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
