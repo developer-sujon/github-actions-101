@@ -1,14 +1,14 @@
-name: Push to Single Self Hosted
+name: Push to Multiple Self Hosted 1
 
 on:
   push:
     branches:
-      - main
+      - multiple-self-hosted-1
 
 jobs:
-  push-to-single-shunno-server:
-    name: Push to Single Self Hosted
-    runs-on: self-hosted
+  push-to-multiple-server:
+    name: Push to Multiple Self Hosted 1
+    runs-on: [self-hosted, production-1]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -28,5 +28,3 @@ jobs:
         run: yarn build
       - name: Run Application
         run: yarn start:prod
-      # - name: Run pm2 logs 2
-      #   run: pm2 logs
