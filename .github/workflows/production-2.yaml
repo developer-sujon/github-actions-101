@@ -3,6 +3,7 @@ name: Push to Multiple Self Hosted 2
 on:
   push:
     branches:
+      - main
       - multiple-self-hosted
 
 jobs:
