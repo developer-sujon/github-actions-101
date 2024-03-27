@@ -1,13 +1,13 @@
-name: Push to Single Github Server
+name: Push to Single Shunno Server
 
 on:
   push:
     branches:
-      - github-single-server
+      - shunno-single-server
 
 jobs:
-  push-to-single-github-server:
-    name: Push to Single Github Server
+  push-to-single-shunno-server:
+    name: Push to Single Shunno Server
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
