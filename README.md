@@ -1,97 +1,201 @@
+Here’s the revised and merged guide combining your previous document and additional improvements for **automatic deployment of a Node.js Express server to a self-hosted Ubuntu VPS using GitHub Actions**:
 
-GitHub/EC2 Instance | Automatic Deployment using GitHub Action
-To automate the deployment of your Node.js Express server to a self-hosted Ubuntu Virtual Private Server (VPS) using GitHub Actions, follow these steps:
+---
 
-## Prerequisites:
-Before you begin, make sure you have the following:
+# **Automatic Deployment of Node.js Express Server to Self-Hosted Ubuntu VPS**
 
-1. A GitHub account
-2. A Virtual Private Server (VPS) running Ubuntu
-2. Your Node.js Express server code ready
-3. Basic knowledge of using the command-line interface (CLI)
+This guide walks you through automating the deployment of your **Node.js Express server** to a self-hosted Ubuntu Virtual Private Server (VPS) using **GitHub Actions**.
 
-### Step 1: Set Up Your Ubuntu VPS
-Ensure that you have a Virtual Private Server (VPS) running Ubuntu installed and configured. You can obtain a VPS from providers like AWS EC2, DigitalOcean, Linode, etc.
+---
 
-### Step 2: Create a GitHub Repository
-Create a new repository on GitHub and push your Node.js Express server code to this repository.
+### **Prerequisites**
+Ensure you have the following ready:
+1. A **GitHub account**.
+2. A **VPS** running Ubuntu (e.g., AWS EC2, DigitalOcean, Linode, etc.).
+3. Your **Node.js Express server** code pushed to a GitHub repository.
+4. Basic knowledge of the command-line interface (CLI).
 
-### Step 3: Set Up Self-Hosted Runner on Your VPS
-Configure a self-hosted GitHub Actions runner on your Ubuntu VPS. Follow the instructions provided by GitHub to set up and configure a self-hosted runner.
+---
 
-### Step 4: Create GitHub Workflow
-Inside your GitHub repository, create a new directory named .github/workflows.
+## **Step 1: Set Up Your Ubuntu VPS**
 
-Within this directory, create a workflow file (e.g., deploy.yml) with the following content:
+1. **Log in to your VPS**:
+   ```bash
+   ssh username@your-vps-ip
+   ```
 
-```
-yaml
-Copy code
-name: Deploy to Self-Hosted VPS
+2. **Update the system and install necessary tools**:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install -y curl git tar
+   ```
 
-on:
-  push:
-    branches:
-      - self-hosted
+3. **Install Node.js and PM2**:
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+   sudo apt install -y nodejs
+   sudo npm install -g pm2
+   ```
 
-jobs:
-  deploy:
-    name: Deploy to Self-Hosted VPS
-    runs-on: self-hosted
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+4. **Optional - Set up a firewall**:
+   Configure your firewall to allow SSH, HTTP, and your application port (e.g., `3000`):
+   ```bash
+   sudo ufw allow OpenSSH
+   sudo ufw allow 3000
+   sudo ufw enable
+   ```
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
+---
 
-      - name: Install dependencies
-        run: |
-          npm install --frozen-lockfile
-          npm install -g pm2
+## **Step 2: Create a GitHub Repository**
 
-      - name: Configure environment
-        run: |
-          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
+1. Go to [GitHub](https://github.com) and create a new repository.
+2. Push your Node.js Express server code to the repository:
+   ```bash
+   git init
+   git remote add origin https://github.com/your-username/your-repo.git
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git push -u origin main
+   ```
 
-      - name: Build Application
-        run: npm run build
+---
 
-      - name: Run Application
-        run: pm2 start npm --name "my-app" -- start
-```
+## **Step 3: Set Up a Self-Hosted Runner on Your VPS**
 
-Save to grepper
-Replace SERVER_PORT with the environment variable your application uses for the port.
+1. **Navigate to your GitHub Repository**:
+   - Go to **Settings > Actions > Runners** and click **Add Runner**.
 
-### Step 5: Create GitHub Secrets
-* Navigate to your repository on GitHub.
-* Go to the "Settings" tab.
-* In the left sidebar, click on "Secrets".
-* Click on the "New repository secret" button.
-* Enter the name and value of your secret, then click "Add secret".
-* Ensure that the secret name matches the one used in your workflow (SERVER_PORT in this example).
+2. **Install the GitHub Runner**:
+   Follow the instructions for Linux provided on GitHub, or run:
+   ```bash
+   cd ~
+   curl -o actions-runner-linux-x64.tar.gz -L https://github.com/actions/runner/releases/latest/download/actions-runner-linux-x64.tar.gz
+   mkdir actions-runner && tar xzf actions-runner-linux-x64.tar.gz -C actions-runner
+   cd actions-runner
+   ```
 
-That's it! Your Node.js Express server will now be automatically deployed to your self-hosted Ubuntu VPS whenever you push changes to the self-hosted branch of your GitHub repository.
+3. **Configure the Runner**:
+   Replace `REPO_URL` and `YOUR_TOKEN` with your repository URL and the token provided during setup:
+   ```bash
+   ./config.sh --url https://github.com/your-username/your-repo --token YOUR_TOKEN
+   ```
 
+4. **Start the Runner**:
+   ```bash
+   ./run.sh
+   ```
 
-### Step 6: Create GitHub Runner and Configure
+5. **Optional - Run as a Service**:
+   To ensure the runner starts on boot:
+   ```bash
+   sudo ./svc.sh install
+   sudo ./svc.sh start
+   ```
 
-Download and Configure the GitHub Runner:
+---
 
-On your Ubuntu VPS, download the GitHub Actions self-hosted runner package by following the instructions provided by GitHub. You can typically find these instructions in the "Set up and configure a self-hosted runner" section of your GitHub repository's Actions settings.
-Extract the downloaded package and run the configuration script. During the configuration process, you'll be prompted to enter your GitHub repository's URL, an access token, and other configuration details.
-Start the GitHub Runner:
+## **Step 4: Create the GitHub Workflow**
 
-Once the configuration is complete, start the GitHub runner service on your VPS. This service will listen for jobs from your GitHub repository and execute them on your VPS.
-You can usually start the runner service using a command like ./svc.sh start.
-Verify Runner Connection:
+1. Inside your repository, create the directory `.github/workflows`.
+2. Add a new file called `deploy.yml` with the following content:
 
-Go to your GitHub repository's "Settings" > "Actions" > "Self-hosted runners" section.
-You should see your self-hosted runner listed as active. If it's active and idle, it means it's successfully connected to your GitHub repository and ready to execute workflows.
-Monitor Runner Status:
+   ```yaml
+   name: Deploy to Self-Hosted VPS
 
-Keep an eye on the runner status to ensure it remains connected and operational. You can monitor this through the GitHub Actions settings or by checking the status of the runner service on your VPS.
-By completing these steps, you'll have successfully created and configured a GitHub Actions self-hosted runner on your Ubuntu VPS. This runner will be responsible for executing workflows triggered by events in your GitHub repository, such as pushes to the self-hosted branch, allowing for automated deployment of your Node.js Express server.
+   on:
+     push:
+       branches:
+         - main
+
+   jobs:
+     deploy:
+       name: Deploy to Self-Hosted VPS
+       runs-on: self-hosted
+
+       steps:
+         # Step 1: Checkout repository
+         - name: Checkout repository
+           uses: actions/checkout@v2
+
+         # Step 2: Use Node.js
+         - name: Use Node.js
+           uses: actions/setup-node@v2
+           with:
+             node-version: '16.x'
+
+         # Step 3: Install dependencies
+         - name: Install dependencies
+           run: |
+             npm install --frozen-lockfile
+             npm install -g pm2
+
+         # Step 4: Configure environment variables
+         - name: Configure environment
+           run: echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
+
+         # Step 5: Build application (if applicable)
+         - name: Build application
+           run: npm run build
+
+         # Step 6: Start the application with PM2
+         - name: Start application
+           run: pm2 start npm --name "my-app" -- start
+   ```
+
+---
+
+## **Step 5: Configure GitHub Secrets**
+
+1. Navigate to your repository on GitHub.
+2. Go to **Settings > Secrets** and click **New repository secret**.
+3. Add the required secrets:
+   - **`SERVER_PORT`**: The port number your app will run on (e.g., `3000`).
+   - Add any other environment variables your app requires.
+
+---
+
+## **Step 6: Trigger the Workflow**
+
+1. Push changes to the `main` branch:
+   ```bash
+   git add .
+   git commit -m "Deploy to VPS"
+   git push origin main
+   ```
+
+2. Go to the **Actions** tab in your GitHub repository to monitor the workflow.
+
+---
+
+## **Step 7: Monitor and Test**
+
+1. **Check Runner Status**:
+   On GitHub, go to **Settings > Actions > Runners**. Ensure your runner is listed as **online**.
+
+2. **Check Workflow Logs**:
+   If the deployment fails, review the logs in the **Actions** tab to debug any issues.
+
+3. **Test Your Application**:
+   Visit your VPS IP or domain at the specified port (e.g., `http://your-vps-ip:3000`) to ensure your Node.js application is running.
+
+---
+
+### **Additional Tips**
+1. **Using a Custom Domain**: 
+   Set up a reverse proxy like **Nginx** to serve your app over a custom domain with HTTPS.
+
+2. **Automate with PM2**:
+   PM2 ensures your application restarts if it crashes:
+   ```bash
+   pm2 startup
+   pm2 save
+   ```
+
+3. **Monitoring**:
+   Use `pm2 monit` to monitor your application in real-time.
+
+---
+
+This workflow ensures your Node.js Express server is automatically deployed to your Ubuntu VPS upon pushing code changes to your GitHub repository. Let me know if you need further clarification or help!
