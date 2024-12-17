@@ -1,7 +1,3 @@
-Here’s the revised and merged guide combining your previous document and additional improvements for **automatic deployment of a Node.js Express server to a self-hosted Ubuntu VPS using GitHub Actions**:
-
----
-
 # **Automatic Deployment of Node.js Express Server to Self-Hosted Ubuntu VPS**
 
 This guide walks you through automating the deployment of your **Node.js Express server** to a self-hosted Ubuntu Virtual Private Server (VPS) using **GitHub Actions**.
